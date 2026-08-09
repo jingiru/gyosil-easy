@@ -9,8 +9,14 @@ React 클라이언트는 `client/dist/`에 정적 파일로 빌드되며 웹 서
 ```dotenv
 VITE_SERVER_URL=http://192.168.0.50:3000
 VITE_BACKUP_SERVER_URL=https://script.google.com/macros/s/AKfycbxltvehv2uEB4SJBMJQ72AvB2qPjcsVqYyOV5-ddHDVRM1Th5DOree10VLS1fRMBOOZrQ/exec
+VITE_BACKUP_API_TIMEOUT_MS=15000
 VITE_DEFAULT_ROOM=classroom-1
 ```
+
+`VITE_SERVER_URL`에 `trycloudflare.com` Quick Tunnel 주소를 사용하면 터널을 다시 시작할 때 주소가
+바뀌거나 사라질 수 있습니다. 방송실 PC를 계속 PRIMARY로 사용할 경우 Named Tunnel의 고정 HTTPS
+호스트명을 사용합니다. `VITE_*` 값은 빌드 시 포함되므로 환경 변수를 바꾼 뒤 클라이언트를 다시
+배포해야 합니다.
 
 서버의 `server/.env`에는 정적 사이트 주소를 허용합니다.
 

@@ -42,7 +42,7 @@ export default function ClassroomScreen({ room, onRoomChange }) {
           <span><strong>교실이지</strong><small>교실 화면</small></span>
         </a>
         <div className="classroom-header-actions">
-          <StatusPill connected={realtime.connected} />
+          <StatusPill connected={realtime.connected} server={realtime.activeServer} />
           <button className="fullscreen-button" type="button" onClick={enterFullscreen} aria-label="전체 화면">
             <ExpandIcon /> <span>전체 화면</span>
           </button>
@@ -89,7 +89,11 @@ export default function ClassroomScreen({ room, onRoomChange }) {
 
       <footer className="classroom-footer">
         <span className={realtime.connected ? 'online' : ''} />
-        {realtime.connected ? '선생님과 실시간으로 연결되어 있어요' : '연결을 확인하고 있어요'}
+        {realtime.activeServer === 'backup'
+          ? '백업 서버와 5초마다 동기화하고 있어요'
+          : realtime.connected
+            ? '선생님과 실시간으로 연결되어 있어요'
+            : '연결을 확인하고 있어요'}
       </footer>
       {notice && <div className={`toast ${notice.type}`} role="status">{notice.message}</div>}
     </div>

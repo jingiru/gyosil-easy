@@ -42,9 +42,17 @@ io(SERVER_URL, { auth: { room: 'classroom-1' } });
 
 클라이언트는 재연결 직후 `/api/state`를 다시 조회해야 합니다. 현재 React 클라이언트에는 이 동작이 구현되어 있습니다.
 
-## 백업 API 호환 규칙
+## 백업 API 전송 규칙
 
-Google Apps Script 백업 API도 위 REST 주소, 상태 코드, JSON 요청/응답을 그대로 구현합니다.
-클라이언트는 PRIMARY 요청이 연결 오류, 시간 초과, `408`, `429`, `5xx`로 실패할 때만 BACKUP에
-같은 경로와 요청을 전달합니다. 따라서 유효성 검사 실패(`400`), PIN 오류(`401`), 없는 메시지
-(`404`), 종료된 메시지(`409`)는 백업 전환 조건이 아닙니다.
+Google Apps Script는 `/exec/api/config` 같은 추가 경로와 브라우저의 `OPTIONS` 사전 요청을 처리하지
+못합니다. 따라서 클라이언트는 기존 REST 요청을 `google-apps-script/Code.gs`가 이해하는 전용 규격으로
+변환합니다.
+
+- GET: `/exec?path=/api/state&method=GET&room=classroom-1`
+- POST: `/exec`에 `text/plain` JSON으로 `path`, `method`, `body`, `teacherPin` 전달
+- 응답: `{ "ok": true, "status": 200, "data": { ... } }`
+
+`status`는 Apps Script의 실제 HTTP 상태 코드가 아니라 응답 봉투 안의 논리 상태입니다. 클라이언트는
+봉투를 해제해 기존 REST 응답과 같은 데이터만 화면에 전달합니다. PRIMARY의 유효성 검사 실패(`400`),
+PIN 오류(`401`), 없는 메시지(`404`), 종료된 메시지(`409`)는 서버 장애가 아니므로 백업에 재전송하지
+않습니다.

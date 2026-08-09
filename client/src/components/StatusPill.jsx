@@ -1,8 +1,9 @@
-export default function StatusPill({ connected }) {
+export default function StatusPill({ connected, server = 'primary' }) {
+  const usingBackup = connected && server === 'backup';
   return (
-    <span className={`status-pill ${connected ? 'is-online' : 'is-offline'}`}>
+    <span className={`status-pill ${connected ? 'is-online' : 'is-offline'} ${usingBackup ? 'is-backup' : ''}`}>
       <span className="status-dot" />
-      {connected ? '실시간 연결됨' : '연결 확인 중'}
+      {usingBackup ? '백업 서버 연결됨' : connected ? '실시간 연결됨' : '연결 확인 중'}
     </span>
   );
 }
