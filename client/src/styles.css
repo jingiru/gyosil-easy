@@ -69,6 +69,7 @@ a { color: inherit; text-decoration: none; }
   white-space: nowrap;
 }
 .status-pill.is-online { color: #14703b; background: #ecfdf3; border-color: #bbf7d0; }
+.status-pill.is-backup { color: #8a4b08; background: #fff7e6; border-color: #fed7aa; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; }
 .is-online .status-dot { background: #22c55e; box-shadow: 0 0 0 4px rgba(34, 197, 94, .12); }
 

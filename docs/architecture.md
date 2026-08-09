@@ -21,14 +21,21 @@ flowchart LR
 조회부터 자동으로 PRIMARY로 돌아갑니다. Apps Script는 Socket.IO를 제공하지 않으므로 백업 중
 변경 사항은 5초 이내에 화면에 반영됩니다.
 
-두 API는 이 문서의 REST 주소와 JSON 형식을 동일하게 제공해야 합니다. 백업 배포 주소는 기본값이
-설정되어 있으며 빌드 환경 변수로 바꾸거나 빈 값으로 비활성화할 수 있습니다.
+두 API가 화면에 제공하는 데이터 형식은 같지만 전송 규격은 다릅니다. PRIMARY는 일반 REST API를,
+BACKUP은 Apps Script의 CORS 제한을 피하는 단일 `/exec` 어댑터를 사용합니다. 백업 배포 주소는
+기본값이 설정되어 있으며 빌드 환경 변수로 바꾸거나 빈 값으로 비활성화할 수 있습니다. Apps Script
+콜드 스타트와 Spreadsheet 접근 시간을 고려해 백업 제한 시간은 기본 15초입니다.
 
 ```dotenv
 VITE_SERVER_URL=http://192.168.0.50:3000
 VITE_BACKUP_SERVER_URL=https://script.google.com/macros/s/배포_ID/exec
 VITE_API_TIMEOUT_MS=4000
+VITE_BACKUP_API_TIMEOUT_MS=15000
 ```
+
+Apps Script 소스와 배포 절차는 `google-apps-script/`에 있습니다. BACKUP 사용 중에는 Socket.IO 대신
+5초 폴링으로 새 상태를 확인합니다. PRIMARY가 복구되면 폴링 요청이 먼저 PRIMARY를 검사하므로 자동
+복귀합니다.
 
 ## 메시지 흐름
 

@@ -1,3 +1,5 @@
+import { createBackupRequest, unwrapBackupEnvelope } from './backupProtocol.js';
+
 const DEFAULT_BACKUP_URL =
   'https://script.google.com/macros/s/AKfycbxltvehv2uEB4SJBMJQ72AvB2qPjcsVqYyOV5-ddHDVRM1Th5DOree10VLS1fRMBOOZrQ/exec';
 
@@ -9,6 +11,7 @@ export const backupServerUrl = (
 ).replace(/\/$/, '');
 
 const requestTimeout = Number(import.meta.env.VITE_API_TIMEOUT_MS) || 4000;
+const backupRequestTimeout = Number(import.meta.env.VITE_BACKUP_API_TIMEOUT_MS) || 15000;
 let activeServer = 'primary';
 const serverListeners = new Set();
 
@@ -35,7 +38,7 @@ function canFailOver(response) {
   return response.status === 408 || response.status === 429 || response.status >= 500;
 }
 
-async function fetchFrom(baseUrl, path, options, server) {
+async function fetchFromPrimary(baseUrl, path, options) {
   const { teacherPin, ...fetchOptions } = options;
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), requestTimeout);
@@ -59,7 +62,35 @@ async function fetchFrom(baseUrl, path, options, server) {
       error.canFailOver = canFailOver(response);
       throw error;
     }
-    announceServer(server);
+    announceServer('primary');
+    return body;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+async function fetchFromBackup(path, options) {
+  const request = createBackupRequest(backupServerUrl, path, options);
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), backupRequestTimeout);
+
+  try {
+    const response = await fetch(request.url, {
+      ...request.options,
+      signal: controller.signal,
+    });
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('백업 API가 JSON이 아닌 응답을 보냈습니다. Apps Script 배포 권한을 확인해 주세요.');
+    }
+
+    const envelope = await response.json();
+    if (!response.ok) {
+      throw new Error(envelope?.error || `백업 요청을 처리하지 못했습니다. (${response.status})`);
+    }
+
+    const body = unwrapBackupEnvelope(envelope);
+    announceServer('backup');
     return body;
   } finally {
     window.clearTimeout(timeoutId);
@@ -67,14 +98,20 @@ async function fetchFrom(baseUrl, path, options, server) {
 }
 
 export async function apiRequest(path, options = {}) {
+  if (!serverUrl) {
+    if (!backupServerUrl) throw new Error('사용할 수 있는 서버 주소가 설정되지 않았습니다.');
+    return fetchFromBackup(path, options);
+  }
+
   try {
-    return await fetchFrom(serverUrl, path, options, 'primary');
+    return await fetchFromPrimary(serverUrl, path, options);
   } catch (primaryError) {
     if (!backupServerUrl || primaryError.canFailOver === false) throw primaryError;
 
     try {
-      return await fetchFrom(backupServerUrl, path, options, 'backup');
+      return await fetchFromBackup(path, options);
     } catch (backupError) {
+      if (backupError.status >= 400 && backupError.status < 500) throw backupError;
       throw new Error(
         `방송실 서버와 백업 서버에 모두 연결할 수 없습니다. (${backupError.message})`,
       );

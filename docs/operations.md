@@ -40,3 +40,16 @@ npm start
 - DB 오류: 서버를 종료하고 손상 전 백업 파일로 `server/data/gyosil-easy.db`를 교체합니다.
 - IP 변경: 방송실 PC에서 `ipconfig`로 현재 IPv4 주소를 확인하고 Raspberry Pi 설정을 갱신합니다.
 - 응답 지연: 교사 휴대폰과 Pi가 같은 내부망에서 방송실 PC 주소에 직접 접근하는지 확인합니다.
+
+## 백업 전환 점검
+
+1. Apps Script의 `/exec?path=/api/config&method=GET`이 `ok: true` JSON을 반환하는지 확인합니다.
+2. Cloudflare Tunnel을 중지하고 Vercel 클라이언트를 새로 엽니다.
+3. 상단 상태가 `백업 서버 연결됨`으로 바뀌는지 확인합니다.
+4. 테스트 질문을 보내고 교실 화면에서 5초 안에 나타나는지 확인합니다.
+5. 응답과 종료를 실행한 뒤 Spreadsheet의 `Backup_Messages`, `Backup_Responses` 시트에 기록되는지 확인합니다.
+6. Tunnel을 다시 시작하고 PRIMARY 자동 복귀를 확인합니다.
+
+PRIMARY의 SQLite와 BACKUP의 Spreadsheet는 현재 서로 다른 데이터 저장소입니다. 백업 중 생성된 기록은
+Spreadsheet에 안전하게 남지만 PRIMARY 복구 시 SQLite로 자동 병합되지는 않습니다. 동기화 기능이
+추가되기 전에는 진행 중인 백업 메시지를 모두 종료한 뒤 PRIMARY를 복구하는 방식으로 운영합니다.

@@ -123,7 +123,7 @@ export default function TeacherScreen({ config, room, onRoomChange }) {
           <span className="brand-mark"><BellIcon size={22} /></span>
           <span><strong>교실이지</strong><small>교사용</small></span>
         </a>
-        <StatusPill connected={realtime.connected} />
+        <StatusPill connected={realtime.connected} server={realtime.activeServer} />
       </header>
 
       <main className="teacher-main">
