@@ -8,6 +8,7 @@ React 클라이언트는 `client/dist/`에 정적 파일로 빌드되며 웹 서
 
 ```dotenv
 VITE_SERVER_URL=http://192.168.0.50:3000
+VITE_BACKUP_SERVER_URL=https://script.google.com/macros/s/AKfycbxltvehv2uEB4SJBMJQ72AvB2qPjcsVqYyOV5-ddHDVRM1Th5DOree10VLS1fRMBOOZrQ/exec
 VITE_DEFAULT_ROOM=classroom-1
 ```
 

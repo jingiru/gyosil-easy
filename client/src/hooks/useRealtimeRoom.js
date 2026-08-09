@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { io } from 'socket.io-client';
-import { apiRequest, serverUrl } from '../lib/api.js';
+import {
+  apiRequest,
+  getActiveServer,
+  serverUrl,
+  subscribeActiveServer,
+} from '../lib/api.js';
 
 function upsert(items, message) {
   return [message, ...items.filter((item) => item.id !== message.id)].sort((a, b) =>
@@ -12,6 +17,7 @@ export function useRealtimeRoom(room) {
   const [state, setState] = useState({ active: [], history: [] });
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
+  const [activeServer, setActiveServer] = useState(getActiveServer);
   const [error, setError] = useState('');
 
   const refresh = useCallback(async () => {
@@ -35,6 +41,11 @@ export function useRealtimeRoom(room) {
       reconnection: true,
       reconnectionDelayMax: 5000,
     });
+
+    const unsubscribe = subscribeActiveServer(setActiveServer);
+    const pollingId = window.setInterval(() => {
+      if (!socket.connected || getActiveServer() === 'backup') refresh();
+    }, 5000);
 
     socket.on('connect', () => {
       setConnected(true);
@@ -65,11 +76,22 @@ export function useRealtimeRoom(room) {
       }));
     });
 
-    return () => socket.disconnect();
+    return () => {
+      window.clearInterval(pollingId);
+      unsubscribe();
+      socket.disconnect();
+    };
   }, [refresh, room]);
 
   return useMemo(
-    () => ({ ...state, loading, connected, error, refresh }),
-    [state, loading, connected, error, refresh],
+    () => ({
+      ...state,
+      loading,
+      connected: connected || activeServer === 'backup',
+      activeServer,
+      error,
+      refresh,
+    }),
+    [state, loading, connected, activeServer, error, refresh],
   );
 }
