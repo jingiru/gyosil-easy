@@ -52,8 +52,8 @@ export default function ClassroomScreen({ room, onRoomChange }) {
       <main className="classroom-main">
         <div className="classroom-toolbar">
           <div>
-            <p className="eyebrow">선생님과 바로 연결되는 화면</p>
-            <h1>{realtime.active.length > 0 ? '새 메시지가 도착했어요' : '교실이지가 기다리고 있어요'}</h1>
+            <p className="eyebrow">교실이지</p>
+            <h1>{realtime.active.length > 0 ? '새 메시지가 도착' : '메시지 대기중'}</h1>
           </div>
           <div className="classroom-settings">
             <div className="respondent-field">
