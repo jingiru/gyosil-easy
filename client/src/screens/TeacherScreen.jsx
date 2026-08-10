@@ -159,7 +159,7 @@ export default function TeacherScreen({ config, room, onRoomChange }) {
                   sendMessage({
                     type: 'call',
                     target: student,
-                    message: `${student}, ${place}로 오렴.`,
+                    message: `${place}로`,
                     responseOptions: callOptions.filter((option) => option.trim()),
                     allowText: true,
                   });
