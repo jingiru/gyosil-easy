@@ -180,7 +180,6 @@ export default function TeacherScreen({ config, room, onRoomChange }) {
                     <option value="강당" />
                   </datalist>
                 </div>
-                <div className="message-preview"><span>화면에 이렇게 보여요</span><strong>{student ? `${place}로.` : '학생 이름을 입력해 주세요.'}</strong></div>
                 <OptionEditor options={callOptions} onChange={setCallOptions} />
                 <button className="button primary full" type="submit" disabled={sending || !student.trim()}>{sending ? '보내는 중…' : '교실로 호출 보내기'}</button>
               </form>
