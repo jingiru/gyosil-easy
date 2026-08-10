@@ -173,10 +173,14 @@ export default function TeacherScreen({ config, room, onRoomChange }) {
                   <label htmlFor="call-place">오도록 할 장소</label>
                   <input id="call-place" value={place} onChange={(event) => setPlace(event.target.value)} maxLength={60} list="place-list" required />
                   <datalist id="place-list">
-                    <option value="교무실" /><option value="방송실" /><option value="상담실" /><option value="보건실" />
+                    <option value="교무실" />
+                    <option value="방송실" />
+                    <option value="상담실" />
+                    <option value="보건실" />
+                    <option value="강당" />
                   </datalist>
                 </div>
-                <div className="message-preview"><span>화면에 이렇게 보여요</span><strong>{student ? `${student}, ${place}로 오렴.` : '학생 이름을 입력해 주세요.'}</strong></div>
+                <div className="message-preview"><span>화면에 이렇게 보여요</span><strong>{student ? `${place}로.` : '학생 이름을 입력해 주세요.'}</strong></div>
                 <OptionEditor options={callOptions} onChange={setCallOptions} />
                 <button className="button primary full" type="submit" disabled={sending || !student.trim()}>{sending ? '보내는 중…' : '교실로 호출 보내기'}</button>
               </form>
