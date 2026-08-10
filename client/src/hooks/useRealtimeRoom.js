@@ -45,7 +45,7 @@ export function useRealtimeRoom(room) {
     const unsubscribe = subscribeActiveServer(setActiveServer);
     const pollingId = window.setInterval(() => {
       if (!socket.connected || getActiveServer() === 'backup') refresh();
-    }, 5000);
+    }, 1000);
 
     socket.on('connect', () => {
       setConnected(true);
