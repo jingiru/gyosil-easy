@@ -3,7 +3,6 @@ import { apiRequest } from '../lib/api.js';
 import { useRealtimeRoom } from '../hooks/useRealtimeRoom.js';
 import { BellIcon, MessageIcon } from '../components/Icons.jsx';
 import HistoryItem from '../components/HistoryItem.jsx';
-import RoomSwitcher from '../components/RoomSwitcher.jsx';
 import StatusPill from '../components/StatusPill.jsx';
 import TeacherMessageCard from '../components/TeacherMessageCard.jsx';
 
@@ -45,7 +44,7 @@ function OptionEditor({ options, onChange }) {
   );
 }
 
-export default function TeacherScreen({ config, room, onRoomChange }) {
+export default function TeacherScreen({ config, room }) {
   const realtime = useRealtimeRoom(room);
   const [tab, setTab] = useState('call');
   const [student, setStudent] = useState('');
@@ -132,7 +131,6 @@ export default function TeacherScreen({ config, room, onRoomChange }) {
             <p className="eyebrow">오늘도 반가워요 👋</p>
             <h1>교실에 무엇을 전할까요?</h1>
           </div>
-          <RoomSwitcher room={room} onChange={onRoomChange} compact />
         </section>
 
         {realtime.error && <div className="alert error">{realtime.error}</div>}
