@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import ClassroomMessageCard from '../components/ClassroomMessageCard.jsx';
 import { BellIcon, ExpandIcon } from '../components/Icons.jsx';
-import RoomSwitcher from '../components/RoomSwitcher.jsx';
 import StatusPill from '../components/StatusPill.jsx';
 import { useRealtimeRoom } from '../hooks/useRealtimeRoom.js';
 
-export default function ClassroomScreen({ room, onRoomChange }) {
+export default function ClassroomScreen({ room }) {
   const realtime = useRealtimeRoom(room);
   const [respondent, setRespondent] = useState(
     () => window.localStorage.getItem(`gyosil-easy-respondent-${room}`) || '',
@@ -60,7 +59,6 @@ export default function ClassroomScreen({ room, onRoomChange }) {
               <label htmlFor="respondent">응답자 표시 <span>(선택)</span></label>
               <input id="respondent" value={respondent} onChange={(event) => updateRespondent(event.target.value)} maxLength={40} placeholder="예: 3학년 1반" />
             </div>
-            <RoomSwitcher room={room} onChange={onRoomChange} compact />
           </div>
         </div>
 
