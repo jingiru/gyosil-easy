@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { apiRequest, queryValue } from './lib/api.js';
+import { apiRequest } from './lib/api.js';
 import ClassroomScreen from './screens/ClassroomScreen.jsx';
 import LandingScreen from './screens/LandingScreen.jsx';
 import TeacherScreen from './screens/TeacherScreen.jsx';
@@ -12,7 +12,6 @@ function currentRoute() {
 
 export default function App() {
   const [route, setRoute] = useState(currentRoute);
-  const [room, setRoom] = useState(() => queryValue('room', environmentRoom));
   const [config, setConfig] = useState(null);
   const [configError, setConfigError] = useState('');
 
@@ -21,7 +20,6 @@ export default function App() {
       const value = await apiRequest('/api/config');
       setConfig(value);
       setConfigError('');
-      setRoom((current) => current || value.defaultRoom);
     } catch (error) {
       setConfigError(error.message);
     }
@@ -31,17 +29,12 @@ export default function App() {
     loadConfig();
     function handleHashChange() {
       setRoute(currentRoute());
-      setRoom(queryValue('room', environmentRoom));
     }
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [loadConfig]);
 
-  function changeRoom(nextRoom) {
-    setRoom(nextRoom);
-    const baseRoute = route === '/' ? '/teacher' : route;
-    window.location.hash = `${baseRoute}?room=${encodeURIComponent(nextRoom)}`;
-  }
+  const room = config?.defaultRoom || environmentRoom;
 
   if (!config) {
     return (
@@ -63,10 +56,10 @@ export default function App() {
   }
 
   if (route === '/teacher') {
-    return <TeacherScreen config={config} room={room} onRoomChange={changeRoom} />;
+    return <TeacherScreen config={config} room={room} />;
   }
   if (route === '/classroom') {
-    return <ClassroomScreen room={room} onRoomChange={changeRoom} />;
+    return <ClassroomScreen room={room} />;
   }
-  return <LandingScreen room={room} />;
+  return <LandingScreen />;
 }
